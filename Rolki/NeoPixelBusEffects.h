@@ -20,7 +20,7 @@ public:
     	NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>(countPixels, pin),
 		_program(1),
 		_step(0),
-		_brightensLevel(4),
+		_brightnessLevel(4),
 		_speedLevel(4),
 		_segmentLength(2)
 
@@ -33,7 +33,7 @@ public:
     	NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>(countPixels, pinClock, pinData),
 		_program(1),
 		_step(0),
-		_brightensLevel(4),
+		_brightnessLevel(4),
 		_speedLevel(4),
 		_segmentLength(2)
     {
@@ -45,7 +45,7 @@ public:
     	NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>(countPixels),
 		_program(1),
 		_step(0),
-		_brightensLevel(4),
+		_brightnessLevel(4),
 		_speedLevel(4),
 		_segmentLength(2)
     {
@@ -70,7 +70,8 @@ public:
 
 	void Run(){
 
-		blink();
+		//blink();
+		switchColor(tabColor, 3);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::Show();
 		_step++;
 
@@ -128,49 +129,46 @@ public:
 	  //setColor(actualColor);
 
 	}
-
+*/
 
 	void switchColor(RgbColor *color, uint8_t num){
-	  uint32_t switchNum;
-	  uint8_t actualBrightness;
-	  uint8_t maxBrightness = 0xFF / (1 << (8 - g_brightnessLevel));
-	  switchNum = (65536/ (1 << g_speedLevel));
-	  actualBrightness = (g_step % switchNum) * maxBrightness / switchNum;
-	//  Serial.print("Step: ");
-	//  Serial.print(g_step);
-	//  Serial.print(" Switch num: ");
-	//  Serial.print(switchNum);
-	//  Serial.print(" BLevel: ");
-	//  Serial.print(g_brightnessLevel);
-	//  Serial.print(" BMax: ");
-	//  Serial.print(maxBrightness);
-	//  Serial.print(" BActual: ");
-	//  Serial.print(actualBrightness, HEX);
-	  // protection befor g_step overflow in next iteration(two color in row or cut some colors from table
-	  //must be add
-	    //if ( (g_step + 2 * num * switchNum > 0xFFFFFFF) && ( (g_step / switchNum) % (num * 2) == 0))
-	  Serial.print(" if: ");
-	  SetColor( color[ ((g_step / switchNum) % (num * 2)) / 2] );
-	  if( !( ( (g_step / switchNum) % (num * 2) ) % num) )
-	  {
-	    Serial.println(0);
-	    strip.SetBrightness(actualBrightness);
-	  }
-	  else
-	  {
-	    strip.SetBrightness(maxBrightness - actualBrightness);
-	    Serial.println(1);
-	  }
+		uint32_t switchNum;
+		uint8_t actualBrightness;
+		uint8_t maxBrightness = 0xFF / (1 << (8 - _brightnessLevel));
+		switchNum = (65536/ (1 << _speedLevel));
+		actualBrightness = (_step % switchNum) * maxBrightness / switchNum;
+		//  Serial.print("Step: ");
+		//  Serial.print(g_step);
+		//  Serial.print(" Switch num: ");
+		//  Serial.print(switchNum);
+		//  Serial.print(" BLevel: ");
+		//  Serial.print(g_brightnessLevel);
+		//  Serial.print(" BMax: ");
+		//  Serial.print(maxBrightness);
+		//  Serial.print(" BActual: ");
+		//  Serial.print(actualBrightness, HEX);
+		// protection befor g_step overflow in next iteration(two color in row or cut some colors from table
+		//must be add
+		//if ( (g_step + 2 * num * switchNum > 0xFFFFFFF) && ( (g_step / switchNum) % (num * 2) == 0))
+		//Serial.print(" if: ");
+		SetStrip( color[ ((_step / switchNum) % (num * 2)) / 2] );
+		if( !( ( (_step / switchNum) % (num * 2) ) % num) )	  {
+			//Serial.println(0);
+			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(actualBrightness);
+		} else {
+			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(maxBrightness - actualBrightness);
+			//Serial.println(1);
+		}
 	}
 
-*/
+
 
 	//virtual ~NeoPixelBusEffects();
 
 protected:
 	uint8_t _program;
 	uint32_t _step;
-	uint8_t _brightensLevel;
+	uint8_t _brightnessLevel;
 	uint8_t _speedLevel;
 	uint8_t _segmentLength;
 
