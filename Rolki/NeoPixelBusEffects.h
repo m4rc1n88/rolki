@@ -210,7 +210,7 @@ private:
 	RgbColor white = RgbColor(255);
 	RgbColor black = RgbColor(0);
 
-	RgbColor tabColor[5];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
+	RgbColor tabColor[8];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
 
 };
 
