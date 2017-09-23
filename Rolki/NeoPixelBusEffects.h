@@ -27,6 +27,13 @@ public:
     {
 		tabColor[0] = red;
 		tabColor[1] = green;
+		tabColor[2] = blue;
+		tabColor[3] = white;
+		tabColor[4] = black;
+		tabColor[5] = yellow;
+		tabColor[6] = magenta;
+		tabColor[7] = cyan;
+
     };
 
 	NeoPixelBusEffects(uint16_t countPixels, uint8_t pinClock, uint8_t pinData) :
@@ -39,6 +46,12 @@ public:
     {
 		tabColor[0] = red;
 		tabColor[1] = green;
+		tabColor[2] = blue;
+		tabColor[3] = white;
+		tabColor[4] = black;
+		tabColor[5] = yellow;
+		tabColor[6] = magenta;
+		tabColor[7] = cyan;
     };
 
 	NeoPixelBusEffects(uint16_t countPixels) :
@@ -51,6 +64,12 @@ public:
     {
 		tabColor[0] = red;
 		tabColor[1] = green;
+		tabColor[2] = blue;
+		tabColor[3] = white;
+		tabColor[4] = black;
+		tabColor[5] = yellow;
+		tabColor[6] = magenta;
+		tabColor[7] = cyan;
     };
 
 
@@ -71,7 +90,7 @@ public:
 	void Run(){
 
 		//blink();
-		switchColor(tabColor, 3);
+		switchColor(tabColor, 8);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::Show();
 		_step++;
 
@@ -137,22 +156,28 @@ public:
 		uint8_t maxBrightness = 0xFF / (1 << (8 - _brightnessLevel));
 		switchNum = (65536/ (1 << _speedLevel));
 		actualBrightness = (_step % switchNum) * maxBrightness / switchNum;
-		//  Serial.print("Step: ");
-		//  Serial.print(g_step);
-		//  Serial.print(" Switch num: ");
-		//  Serial.print(switchNum);
-		//  Serial.print(" BLevel: ");
-		//  Serial.print(g_brightnessLevel);
-		//  Serial.print(" BMax: ");
-		//  Serial.print(maxBrightness);
-		//  Serial.print(" BActual: ");
-		//  Serial.print(actualBrightness, HEX);
+/*		  Serial.print("Step: ");
+		  Serial.print(_step);
+		  Serial.print(" Switch num: ");
+		  Serial.print(switchNum);
+		  Serial.print(" BLevel: ");
+		  Serial.print(_brightnessLevel);
+		  Serial.print(" BMax: ");
+		  Serial.print(maxBrightness);
+		  Serial.print(" BActual: ");
+		  Serial.print(actualBrightness);
+		  Serial.print(" Col num: ");
+		  Serial.print(((_step / switchNum) % (num * 2)) / 2);
+		  Serial.print(" if: ");*/
 		// protection befor g_step overflow in next iteration(two color in row or cut some colors from table
 		//must be add
 		//if ( (g_step + 2 * num * switchNum > 0xFFFFFFF) && ( (g_step / switchNum) % (num * 2) == 0))
-		//Serial.print(" if: ");
+
+
+
+
 		SetStrip( color[ ((_step / switchNum) % (num * 2)) / 2] );
-		if( !( ( (_step / switchNum) % (num * 2) ) % num) )	  {
+		if( !( ( (_step / switchNum) % (num * 2) ) % 2 ) )	  {
 			//Serial.println(0);
 			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(actualBrightness);
 		} else {
@@ -177,10 +202,15 @@ private:
 	RgbColor red = RgbColor(255, 0, 0);
 	RgbColor green = RgbColor(0, 255, 0);
 	RgbColor blue = RgbColor(0, 0, 255);
+
+	RgbColor yellow = RgbColor(255, 255, 0);
+	RgbColor magenta = RgbColor(255, 0, 255);
+	RgbColor cyan = RgbColor(0, 255, 255);
+
 	RgbColor white = RgbColor(255);
 	RgbColor black = RgbColor(0);
 
-	RgbColor tabColor[2];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
+	RgbColor tabColor[5];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
 
 };
 
