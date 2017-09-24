@@ -90,65 +90,34 @@ public:
 	void Run(){
 
 		//blink();
-		switchColor(tabColor, 8);
+		//switchColor(tabColor, 8);
+		jumpColor(tabColor, 8);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::Show();
 		_step++;
 
 
 	}
 
-/*
-	void jump(RgbColor *color, uint8_t num){
-	uint16_t switchNum;
-	switchNum = (16384/(1 << g_speedLevel));
-	//if(g_debugLevel > 2)Serial.print("Function Jump3 g_step: ");
-	//if(g_debugLevel > 2)Serial.print(g_step);
-	//if(g_debugLevel > 2)Serial.print("switch Num: ");
 
-	//if(g_debugLevel > 2)Serial.print(switchNum);
-	//if(g_debugLevel > 2)Serial.print("case: ");
-	//if(g_debugLevel > 2)Serial.print((g_step/switchNum)%3);
+	void jumpColor(RgbColor *color, uint8_t num){
+		uint16_t switchNum;
+		switchNum = (16384/(1 << _speedLevel));
+		//if(g_debugLevel > 2)Serial.print("Function Jump3 _step: ");
+		//if(g_debugLevel > 2)Serial.print(_step);
+		//if(g_debugLevel > 2)Serial.print("switch Num: ");
 
-	// protection befor g_step overflow in next iteration(two color in row or cut some colors) not tested
-	if( (( g_step / switchNum ) % num == 0) && (g_step + num * switchNum > 0xFFFFFF) )g_step = 0;
-	SetColor(color[(g_step / switchNum) % num]);
-	}
+		//if(g_debugLevel > 2)Serial.print(switchNum);
+		//if(g_debugLevel > 2)Serial.print("case: ");
+		//if(g_debugLevel > 2)Serial.print((_step/switchNum)%num);
 
-
-
-	void pulse(RgbColor color)
-	{
-	  //Serial.println("Pulse");
-	  uint16_t switchNum;
-	  uint32_t actualColor;
-	  uint32_t blueComponent, greenComponent, redComponent;
-	  switchNum = (65536/ (1 << g_speedLevel));
-	  //Serial.println( (g_step % switchNum) * 255 / switchNum );
-
-	  SetColor(color);
-	  if ( (g_step/switchNum)%2 )
-	  {
-	    //Serial.println(1);
-	    strip.SetBrightness((g_step % switchNum) * 255 / switchNum );
-	  }
-	  else
-	  {
-	    //Serial.println(2);
-	    strip.SetBrightness(255 - (g_step % switchNum) * 255 / switchNum );
-	  }
-	  strip.Show();
+		// protection from _step overflow in next iteration(two color in row or cut some colors) not tested
+		if( (( _step / switchNum ) % num == 0) && (_step + num * switchNum > 0xFFFFFF) )_step = 0;
+		SetStrip(color[(_step / switchNum) % num]);
+		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 
 
-	//  Serial.print("Step: ");
-	//  Serial.print(g_step);
-	//  Serial.print("switch num: ");
-	//  Serial.print(switchNum);
-	//  Serial.print("Color: ");
-	//  Serial.println(actualColor,HEX);
-	  //setColor(actualColor);
+	}//End function jumpColor
 
-	}
-*/
 
 	void switchColor(RgbColor *color, uint8_t num){
 		uint32_t switchNum;
@@ -169,11 +138,11 @@ public:
 		  Serial.print(" Col num: ");
 		  Serial.print(((_step / switchNum) % (num * 2)) / 2);
 		  Serial.print(" if: ");*/
+
+
 		// protection befor g_step overflow in next iteration(two color in row or cut some colors from table
 		//must be add
 		//if ( (g_step + 2 * num * switchNum > 0xFFFFFFF) && ( (g_step / switchNum) % (num * 2) == 0))
-
-
 
 
 		SetStrip( color[ ((_step / switchNum) % (num * 2)) / 2] );
@@ -184,7 +153,7 @@ public:
 			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(maxBrightness - actualBrightness);
 			//Serial.println(1);
 		}
-	}
+	}//End function switchColor
 
 
 
