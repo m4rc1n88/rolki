@@ -8,9 +8,9 @@
 #ifndef NEOPIXELBUSEFFECTS_H_
 #define NEOPIXELBUSEFFECTS_H_
 
+#define MAX_COLOR_NUM 8
+
 #include "NeoPixelBrightnessBus.h"
-
-
 
 template<typename T_COLOR_FEATURE, typename T_METHOD> class NeoPixelBusEffects :
 		public NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>
@@ -84,6 +84,7 @@ public:
 
 		if ( (_step / switchNum) % 2) SetStrip( tabColor[0] );
 		else SetStrip( tabColor[1]);
+		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 	}
 
 
@@ -98,16 +99,12 @@ public:
 		case 3:
 			jumpColor(tabColor, 8);
 			break;
-
-
 		}
 		//blink();
 		//switchColor(tabColor, 8);
 		//jumpColor(tabColor, 8);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::Show();
 		_step++;
-
-
 	}
 
 
@@ -126,8 +123,6 @@ public:
 		if( (( _step / switchNum ) % num == 0) && (_step + num * switchNum > 0xFFFFFF) )_step = 0;
 		SetStrip(color[(_step / switchNum) % num]);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
-
-
 	}//End function jumpColor
 
 
@@ -171,6 +166,34 @@ public:
 		_program = p_program;
 	}
 
+	void setBrightnessLevel(uint8_t p_brightnessLevel){
+		_brightnessLevel = p_brightnessLevel;
+	}
+
+	void setSpeedLevel(uint8_t p_speedLevel){
+		_speedLevel = p_speedLevel;
+	}
+
+	void setSegmentLength(uint8_t p_segmentLength){
+		_segmentLength = p_segmentLength;
+	}
+
+
+	void setColor(uint32_t p_color, uint8_t p_num){
+		if(p_num > MAX_COLOR_NUM - 1)p_num = 0;
+		tabColor[p_num] = RgbColor( (p_color >> 16) & 0xFF, (p_color >> 8) & 0xFF, (p_color >> 0) & 0xFF);
+	}
+
+	void setDefaultColorTab(){
+		tabColor[0] = red;
+		tabColor[1] = green;
+		tabColor[2] = blue;
+		tabColor[3] = white;
+		tabColor[4] = black;
+		tabColor[5] = yellow;
+		tabColor[6] = magenta;
+		tabColor[7] = cyan;
+	}
 	//virtual ~NeoPixelBusEffects();
 
 protected:
@@ -193,7 +216,7 @@ private:
 	RgbColor white = RgbColor(255);
 	RgbColor black = RgbColor(0);
 
-	RgbColor tabColor[8];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
+	RgbColor tabColor[MAX_COLOR_NUM];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
 
 };
 
