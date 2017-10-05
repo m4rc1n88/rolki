@@ -88,10 +88,22 @@ public:
 
 
 	void Run(){
+		switch(_program){
+		case 1:
+			blink();
+			break;
+		case 2:
+			switchColor(tabColor, 8);
+			break;
+		case 3:
+			jumpColor(tabColor, 8);
+			break;
 
+
+		}
 		//blink();
 		//switchColor(tabColor, 8);
-		jumpColor(tabColor, 8);
+		//jumpColor(tabColor, 8);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::Show();
 		_step++;
 
@@ -155,7 +167,9 @@ public:
 		}
 	}//End function switchColor
 
-
+	void setProgram(uint8_t p_program){
+		_program = p_program;
+	}
 
 	//virtual ~NeoPixelBusEffects();
 
