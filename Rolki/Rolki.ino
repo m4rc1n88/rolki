@@ -7,6 +7,10 @@
 #define PixelCount 12
 #define PixelPin 2
 
+#define AP_MODE 1
+#define CLIENT_MODE 2
+#define MODE AP_MODE
+
 #define colorSaturation 255 // saturation of color constants
 
 
@@ -35,9 +39,13 @@ WiFiUDP Udp;
 
 
 void initWiFi(){
-	WiFi.mode(WIFI_AP);
-	WiFi.softAPConfig(ipServer, gateway, subnet);
-	WiFi.softAP(networkName,password);
+	#if MODE == AP_MODE
+		WiFi.mode(WIFI_AP);
+		WiFi.softAPConfig(ipServer, gateway, subnet);
+		WiFi.softAP(networkName,password);
+	#elif MOOD== CLIENT_MODE
+		//Client mode will be defined
+	#endif
 }
 
 void initSerial(){
@@ -46,14 +54,22 @@ void initSerial(){
 
 
 void printWifiStatus() {
-	IPAddress ip = WiFi.softAPIP();
-	Serial.print("IP Address: ");
-	Serial.println(ip);
+	#if MODE == AP_MODE
+		IPAddress ip = WiFi.softAPIP();
+		Serial.print("IP Address: ");
+		Serial.println(ip);
+	#elif MOOD == CLIENT_MODE
+		//Client mode will be defined
+	#endif
 }
 
 
 void initUdp(){
+#if MODE == AP_MODE
 	Udp.begin(localPort);
+#elif MOOD == CLIENT_MODE
+	//Client mode will be defined
+#endif
 }
 
 
@@ -68,7 +84,7 @@ void readUdpData(){
 	uint8_t noBytes = Udp.parsePacket();
 	if(noBytes){
 		Udp.read(packetBuffer, noBytes);
-		Serial.print("Recived: ");Serial.print(noBytes);Serial.println("bytes");
+		Serial.print("Recievd: ");Serial.print(noBytes);Serial.println("bytes");
 		for(uint8_t i = 0; i < noBytes; i++){
 			Serial.print("Data[");
 			Serial.print(i);
@@ -78,6 +94,8 @@ void readUdpData(){
 		if((packetBuffer[0] == 0x01) && (packetBuffer[0] == 0x01))strip.setProgram(1);
 		else if((packetBuffer[0] == 0x02) && (packetBuffer[0] == 0x02))strip.setProgram(2);
 		else if((packetBuffer[0] == 0x03) && (packetBuffer[0] == 0x03))strip.setProgram(3);
+
+		//new parser must be implemented
 
 	}
 }
@@ -94,7 +112,7 @@ void setup() {
 	initStrip();
 }
 
-// the loop function runs over and over again forever
+
 void loop() {
 	//delay(10);
 	strip.Run();
