@@ -99,6 +99,9 @@ public:
 		case 3:
 			jumpColor(tabColor, 8);
 			break;
+		case 4:
+			swapTwoColor();
+			break;
 		}
 		//blink();
 		//switchColor(tabColor, 8);
@@ -161,6 +164,31 @@ public:
 			//Serial.println(1);
 		}
 	}//End function switchColor
+
+	void snake(){
+
+
+	}
+
+	void swapTwoColor(){
+		uint16_t switchNum;
+		switchNum = (16384/(1 << _speedLevel));
+
+		if ( (_step / switchNum) % 2){
+			for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ ){
+				NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, tabColor[(i / _segmentLength) % 2]);
+			}
+		}
+		else {
+			for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ ){
+				NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, tabColor[ !((i / _segmentLength) % 2)]);
+			}
+		}
+		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
+
+	}
+
+
 
 	void setProgram(uint8_t p_program){
 		_program = p_program;
