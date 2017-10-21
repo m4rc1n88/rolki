@@ -185,7 +185,6 @@ public:
 			}
 		}
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
-
 	}
 
 

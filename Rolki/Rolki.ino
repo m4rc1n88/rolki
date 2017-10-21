@@ -2,6 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include "NeoPixelBusEffects.h"
+//#include "Defintion.h"
 
 #pragma once
 #define PixelCount 12
@@ -10,6 +11,9 @@
 #define AP_MODE 1
 #define CLIENT_MODE 2
 #define MODE AP_MODE
+
+#define DUBUG_RECIEVED 1
+
 
 #define colorSaturation 255 // saturation of color constants
 
@@ -48,6 +52,7 @@ void initWiFi(){
 	#endif
 }
 
+
 void initSerial(){
 	Serial.begin(115200);
 }
@@ -76,11 +81,14 @@ void initUdp(){
 void initStrip(){
 	strip.Begin();
 	strip.SetStrip(blue);
+	strip.setProgram(4);
 	strip.Show();
+
 }
 
 
 void readUdpData(){
+	uint8_t v_program;
 	uint8_t noBytes = Udp.parsePacket();
 	if(noBytes){
 		Udp.read(packetBuffer, noBytes);
@@ -91,6 +99,65 @@ void readUdpData(){
 			Serial.print("] = ");
 			Serial.println(packetBuffer[i]);
 		}
+		/*
+		if(packetBuffer[0] == PROTECTION_BIT){
+			Serial.println("CRC OK");
+			v_program = packetBuffer[1];
+			switch(v_program){
+			case TURN_OFF:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Turn Off");
+				#endif
+				if(packetBuffer[2] == TURN_OFF_LEN){
+					Serial.println("Length of parameters - OK");
+					//action
+				} else {
+					Serial.println("Length of parameters - N_OK");
+
+				}
+				break;
+			case SIMPLE:
+
+				break;
+			case BLINK:
+
+				break;
+			case BLINK_2_COLORS:
+
+				break;
+			case JUMP_3:
+
+				break;
+			case JUMP_7:
+
+				break;
+			case SWITCH_3:
+
+				break;
+			case SWITCH_7:
+
+				break;
+			case SNAKE:
+
+				break;
+			case PULSE:
+
+				break;
+
+
+
+
+
+			default:
+				Serial.println("Unknow Program");
+				break;
+			}
+		} else {
+			Serial.println("CRC N_OK");
+		}
+*/
+
+
 		if((packetBuffer[0] == 0x01) && (packetBuffer[0] == 0x01))strip.setProgram(1);
 		else if((packetBuffer[0] == 0x02) && (packetBuffer[0] == 0x02))strip.setProgram(2);
 		else if((packetBuffer[0] == 0x03) && (packetBuffer[0] == 0x03))strip.setProgram(3);
@@ -110,6 +177,7 @@ void setup() {
 	initUdp();
 	delay(100);
 	initStrip();
+
 }
 
 
@@ -117,8 +185,6 @@ void loop() {
 	//delay(10);
 	strip.Run();
 	readUdpData();
-
-
 
 	//Serial.println("Loop");
 }
