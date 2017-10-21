@@ -11,7 +11,7 @@
 #define MAX_COLOR_NUM 8
 
 #include "NeoPixelBrightnessBus.h"
-
+#include "Defintion.h"
 template<typename T_COLOR_FEATURE, typename T_METHOD> class NeoPixelBusEffects :
 		public NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>
 {
@@ -90,16 +90,34 @@ public:
 
 	void Run(){
 		switch(_program){
-		case 1:
+		case TURN_OFF:
+			SetStrip(black);
+			break;
+		case SIMPLE:
+			SetStrip(tabColor[0]);
+			break;
+		case BLINK:
 			blink();
 			break;
-		case 2:
-			switchColor(tabColor, 8);
+		case BLINK_2_COLORS:
+			blink();
 			break;
-		case 3:
-			jumpColor(tabColor, 8);
+		case PULSE:
+			switchColor(tabColor, 1);
 			break;
-		case 4:
+		case SWITCH_3:
+			switchColor(tabColor, 3);
+			break;
+		case SWITCH_7:
+			switchColor(tabColor, 7);
+			break;
+		case JUMP_3:
+			jumpColor(tabColor, 3);
+			break;
+		case JUMP_7:
+			jumpColor(tabColor, 7);
+			break;
+		case 22:
 			swapTwoColor();
 			break;
 		}
@@ -191,6 +209,7 @@ public:
 
 	void setProgram(uint8_t p_program){
 		_program = p_program;
+		_step = 0;
 	}
 
 	void setBrightnessLevel(uint8_t p_brightnessLevel){
@@ -211,15 +230,20 @@ public:
 		tabColor[p_num] = RgbColor( (p_color >> 16) & 0xFF, (p_color >> 8) & 0xFF, (p_color >> 0) & 0xFF);
 	}
 
+	void setColor(uint8_t p_red, uint8_t p_green, uint8_t p_blue, uint8_t p_num){
+		if(p_num > MAX_COLOR_NUM - 1)p_num = 0;
+		tabColor[p_num] = RgbColor( p_red, p_green, p_blue);
+	}
+
 	void setDefaultColorTab(){
 		tabColor[0] = red;
 		tabColor[1] = green;
 		tabColor[2] = blue;
 		tabColor[3] = white;
-		tabColor[4] = black;
-		tabColor[5] = yellow;
-		tabColor[6] = magenta;
-		tabColor[7] = cyan;
+		tabColor[4] = yellow;
+		tabColor[5] = magenta;
+		tabColor[6] = cyan;
+		tabColor[7] = black;
 	}
 	//virtual ~NeoPixelBusEffects();
 

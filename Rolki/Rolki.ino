@@ -2,7 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include "NeoPixelBusEffects.h"
-//#include "Defintion.h"
+#include "Defintion.h"
 
 #pragma once
 #define PixelCount 12
@@ -12,7 +12,7 @@
 #define CLIENT_MODE 2
 #define MODE AP_MODE
 
-#define DUBUG_RECIEVED 1
+#define DUBUG_RECIEVED 2
 
 
 #define colorSaturation 255 // saturation of color constants
@@ -46,9 +46,12 @@ void initWiFi(){
 	#if MODE == AP_MODE
 		WiFi.mode(WIFI_AP);
 		WiFi.softAPConfig(ipServer, gateway, subnet);
-		WiFi.softAP(networkName,password);
-	#elif MOOD== CLIENT_MODE
-		//Client mode will be defined
+		WiFi.softAP(networkName, password);
+	#endif
+	#if MODE == CLIENT_MODE
+		  WiFi.mode(WIFI_STA);
+		  WiFi.config(ipClient, gateway, subnet);
+		  WiFi.begin(networkName, password);
 	#endif
 }
 
@@ -63,8 +66,10 @@ void printWifiStatus() {
 		IPAddress ip = WiFi.softAPIP();
 		Serial.print("IP Address: ");
 		Serial.println(ip);
-	#elif MOOD == CLIENT_MODE
-		//Client mode will be defined
+	#elif MODE == CLIENT_MODE
+		IPAddress ip = WiFi.localIP();
+		Serial.print("IP Address: ");
+		Serial.println(ip);
 	#endif
 }
 
@@ -72,8 +77,8 @@ void printWifiStatus() {
 void initUdp(){
 #if MODE == AP_MODE
 	Udp.begin(localPort);
-#elif MOOD == CLIENT_MODE
-	//Client mode will be defined
+#elif MODE == CLIENT_MODE
+	Udp.begin(localPort);
 #endif
 }
 
@@ -92,14 +97,28 @@ void readUdpData(){
 	uint8_t noBytes = Udp.parsePacket();
 	if(noBytes){
 		Udp.read(packetBuffer, noBytes);
-		Serial.print("Recievd: ");Serial.print(noBytes);Serial.println("bytes");
+//		#if MODE == AP_MODE
+//	    Udp.beginPacket(ipClient, localPort);
+//	    Udp.write(packetBuffer, noBytes);
+//	    Udp.endPacket();
+//		#endif
+
+		#if DUBUG_RECIEVED >= 1
+		Serial.print("Recievd: ");
+		Serial.print(noBytes);
+		Serial.print("bytes from ");
+		Serial.print(Udp.remoteIP());
+		Serial.print(":");
+		Serial.println(Udp.remotePort());
+		#endif
+		#if DUBUG_RECIEVED >= 2
 		for(uint8_t i = 0; i < noBytes; i++){
 			Serial.print("Data[");
 			Serial.print(i);
 			Serial.print("] = ");
 			Serial.println(packetBuffer[i]);
 		}
-		/*
+		#endif
 		if(packetBuffer[0] == PROTECTION_BIT){
 			Serial.println("CRC OK");
 			v_program = packetBuffer[1];
@@ -109,60 +128,194 @@ void readUdpData(){
 				Serial.println("Program Turn Off");
 				#endif
 				if(packetBuffer[2] == TURN_OFF_LEN){
+					#if DUBUG_RECIEVED >= 1
 					Serial.println("Length of parameters - OK");
-					//action
+					#endif
+					strip.setProgram(TURN_OFF);
 				} else {
+					#if DUBUG_RECIEVED >= 1
 					Serial.println("Length of parameters - N_OK");
-
+					#endif
 				}
 				break;
+
 			case SIMPLE:
-
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Simple");
+				#endif
+				if(packetBuffer[2] == SIMPLE_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
+					strip.setProgram(SIMPLE);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
 				break;
+
 			case BLINK:
-
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Turn Blink");
+				#endif
+				if(packetBuffer[2] == BLINK_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
+					strip.setColor(0, 1);
+					strip.setSpeedLevel(packetBuffer[6]);
+					strip.setProgram(BLINK);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
 				break;
+
 			case BLINK_2_COLORS:
-
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program blink 2 colors");
+				#endif
+				if(packetBuffer[2] == BLINK_2_COLORS_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
+					strip.setColor(packetBuffer[6], packetBuffer[7], packetBuffer[8], 1);
+					strip.setSpeedLevel(packetBuffer[9]);
+					strip.setProgram(BLINK_2_COLORS);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
 				break;
-			case JUMP_3:
 
-				break;
-			case JUMP_7:
-
-				break;
-			case SWITCH_3:
-
-				break;
-			case SWITCH_7:
-
-				break;
-			case SNAKE:
-
-				break;
 			case PULSE:
-
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Pulse");
+				#endif
+				if(packetBuffer[2] == PULSE_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
+					strip.setSpeedLevel(packetBuffer[6]);
+					strip.setProgram(PULSE);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
 				break;
 
+			case JUMP_3:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Jump 3");
+				#endif
+				if(packetBuffer[2] == JUMP_3_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setDefaultColorTab();
+					strip.setBrightnessLevel(packetBuffer[3]);
+					strip.setSpeedLevel(packetBuffer[4]);
+					strip.setProgram(JUMP_3);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
 
+			case JUMP_7:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Jump 7");
+				#endif
+				if(packetBuffer[2] == JUMP_7_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setDefaultColorTab();
+					strip.setBrightnessLevel(packetBuffer[3]);
+					strip.setSpeedLevel(packetBuffer[4]);
+					strip.setProgram(JUMP_7);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
 
+			case SWITCH_3:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Switch 3");
+				#endif
+				if(packetBuffer[2] == SWITCH_3_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setDefaultColorTab();
+					strip.setBrightnessLevel(packetBuffer[3]);
+					strip.setSpeedLevel(packetBuffer[4]);
+					strip.setProgram(SWITCH_3);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
+
+			case SWITCH_7:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Switch 7");
+				#endif
+				if(packetBuffer[2] == SWITCH_7_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setDefaultColorTab();
+					strip.setBrightnessLevel(packetBuffer[3]);
+					strip.setSpeedLevel(packetBuffer[4]);
+					strip.setProgram(SWITCH_7);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
+
+			case SNAKE:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Turn Off");
+				#endif
+				if(packetBuffer[2] == SNAKE_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					//action
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
 
 
 			default:
+				#if DUBUG_RECIEVED >= 1
 				Serial.println("Unknow Program");
+				#endif
 				break;
-			}
+			}//end switch v_program
 		} else {
+			#if DUBUG_RECIEVED >= 1
 			Serial.println("CRC N_OK");
+			#endif
 		}
-*/
-
-
-		if((packetBuffer[0] == 0x01) && (packetBuffer[0] == 0x01))strip.setProgram(1);
-		else if((packetBuffer[0] == 0x02) && (packetBuffer[0] == 0x02))strip.setProgram(2);
-		else if((packetBuffer[0] == 0x03) && (packetBuffer[0] == 0x03))strip.setProgram(3);
-
-		//new parser must be implemented
 
 	}
 }

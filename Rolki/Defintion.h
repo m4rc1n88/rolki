@@ -31,7 +31,7 @@
 #define SIMPLE_LEN	3
 #define BLINK_LEN	4
 #define BLINK_2_COLORS_LEN	8
-#define PULSE_LEN 3
+#define PULSE_LEN 4
 #define HSV_SNAKE_LEN 2
 #define HSV_TO_WHITE_LEN 2
 #define HSV_LEN 2
