@@ -73,9 +73,25 @@ public:
     };
 
 
+	void SetPixelColor(uint8_t p_pixel_number, RgbColor p_pixel_color, bool p_gamma = 0){
+		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(p_pixel_number, p_pixel_color);
+		//gamma correction will be implemented
+	}
+
+
+	uint8_t PixelCount(){
+		return NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::PixelCount();
+	}
+
+
+	void SetBrightness(uint8_t p_brightness) {
+		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(p_brightness);
+	}
+
+
 	void SetStrip(RgbColor color){
-		for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ )NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, color);
-	};
+		for(uint8_t i = 0; i < PixelCount(); i++ )SetPixelColor(i, color);
+	}
 
 
 	void blink(){
@@ -84,7 +100,7 @@ public:
 
 		if ( (_step / switchNum) % 2) SetStrip( tabColor[0] );
 		else SetStrip( tabColor[1]);
-		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
+		SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 	}
 
 
@@ -152,7 +168,7 @@ public:
 		// protection from _step overflow in next iteration(two color in row or miss some colors) not tested
 		if( (( _step / switchNum ) % num == 0) && (_step + num * switchNum > 0xFFFFFF) )_step = 0;
 		SetStrip(color[(_step / switchNum) % num]);
-		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
+		SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 	}//End function jumpColor
 
 
@@ -185,9 +201,9 @@ public:
 		SetStrip( color[ ((_step / switchNum) % (num * 2)) / 2] );
 		if( !( ( (_step / switchNum) % (num * 2) ) % 2 ) ) {
 			//Serial.println(0);
-			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(actualBrightness);
+			SetBrightness(actualBrightness);
 		} else {
-			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(maxBrightness - actualBrightness);
+			SetBrightness(maxBrightness - actualBrightness);
 			//Serial.println(1);
 		}
 	}//End function switchColor
@@ -196,12 +212,12 @@ public:
 		uint16_t v_switchNum;
 		uint8_t v_startPixel;
 		v_switchNum = (16384/(1 << _speedLevel));
-		if( (( _step / v_switchNum ) % NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() == 0) &&
-				(_step + NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() * v_switchNum > 0xFFFFFF) )_step = 0;
-		v_startPixel = (_step / v_switchNum) % NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount();
+		if( (( _step / v_switchNum ) % PixelCount() == 0) &&
+				(_step + PixelCount() * v_switchNum > 0xFFFFFF) )_step = 0;
+		v_startPixel = (_step / v_switchNum) % PixelCount();
 		SetStrip(tabColor[0]);
 		for(uint8_t i = 0; i < _segmentLength; i++ ){
-			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor( (i + v_startPixel) % NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(), tabColor[1]);
+			SetPixelColor( (i + v_startPixel) % PixelCount(), tabColor[1]);
 		}
 	}
 
@@ -215,12 +231,12 @@ public:
 
 		if((_step / v_switchNum) % 2 ) v_f_progressL = 1 - v_f_progressL;
 
-	    for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++){
-	    	v_f_progressH = i / static_cast<float>(NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() - 1);
+	    for(uint8_t i = 0; i < PixelCount(); i++){
+	    	v_f_progressH = i / static_cast<float>(PixelCount() - 1);
 	    	//v_color = colorGamma.Correct(RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL)));
 	    	//Serial.print("Progress[");Serial.print(i);Serial.print("] = ");Serial.print(v_f_progressH);
 	    	v_color = RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL));
-	    	NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, v_color);
+	    	SetPixelColor(i, v_color);
 	    }
 
 
@@ -233,15 +249,15 @@ public:
 		float progress;
 		switchNum = (65536/(1 << _speedLevel));
 
-		for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ ){
-			progress = (i * (switchNum / static_cast<float>(NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() - 1)) + _step % switchNum)/switchNum;
+		for(uint8_t i = 0; i < PixelCount(); i++ ){
+			progress = (i * (switchNum / static_cast<float>(PixelCount() - 1)) + _step % switchNum)/switchNum;
 			if(progress > 1.0f)progress -= 1.0f;
 			//v_color = colorGamma.Correct(RgbColor(HslColor(progress, 1.0f, 0.5f)));
 			v_color = RgbColor(HslColor(progress, 1.0f, 0.5f));
-			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, v_color);
+			SetPixelColor(i, v_color);
 		}
 
-		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
+		SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 	}
 
 
@@ -251,16 +267,16 @@ public:
 		switchNum = (16384/(1 << _speedLevel));
 
 		if ( (_step / switchNum) % 2){
-			for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ ){
-				NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, tabColor[(i / _segmentLength) % 2]);
+			for(uint8_t i = 0; i < PixelCount(); i++ ){
+				SetPixelColor(i, tabColor[(i / _segmentLength) % 2]);
 			}
 		}
 		else {
-			for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ ){
-				NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, tabColor[ !((i / _segmentLength) % 2)]);
+			for(uint8_t i = 0; i < PixelCount(); i++ ){
+				SetPixelColor(i, tabColor[ !((i / _segmentLength) % 2)]);
 			}
 		}
-		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
+		SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 	}
 
 
