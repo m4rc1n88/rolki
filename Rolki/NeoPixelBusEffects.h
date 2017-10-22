@@ -224,7 +224,7 @@ public:
 
 
 	void  HslToWhite(){
-		uint16_t v_switchNum;
+		uint32_t v_switchNum;
 		RgbColor v_color;
 		float v_f_progressL, v_f_progressH;
 		v_switchNum = (65536/(1 << _speedLevel));
@@ -239,10 +239,8 @@ public:
 	    	v_color = RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL));
 	    	SetPixelColor(i, v_color, GAMMA_CORRECTION_ON);
 	    }
-
-
-
 	}
+
 
 	void HslSnake(){
 		uint32_t v_switchNum;
