@@ -139,10 +139,10 @@ public:
 		case SNAKE:
 			snake();
 			break;
-		case HSV_SNAKE:
-			HSLSnake();
+		case HSL_SNAKE:
+			HslSnake();
 			break;
-		case HSV_TO_WHITE:
+		case HSL_TO_WHITE:
 			HslToWhite();
 			break;
 		}
@@ -243,7 +243,7 @@ public:
 
 	}
 
-	void HSLSnake(){
+	void HslSnake(){
 		uint16_t switchNum;
 		RgbColor v_color;
 		float progress;

@@ -17,8 +17,8 @@
 #define BLINK	2
 #define BLINK_2_COLORS	3
 #define PULSE 4
-#define HSV_SNAKE 5
-#define HSV_TO_WHITE 6
+#define HSL_SNAKE 5
+#define HSL_TO_WHITE 6
 #define HSV	7
 #define JUMP_3 8
 #define JUMP_7 9
@@ -33,9 +33,9 @@
 #define BLINK_LEN	4
 #define BLINK_2_COLORS_LEN	8
 #define PULSE_LEN 4
-#define HSV_SNAKE_LEN 2
-#define HSV_TO_WHITE_LEN 2
-#define HSV_LEN 2
+#define HSL_SNAKE_LEN 2
+#define HSL_TO_WHITE_LEN 2
+#define HSL_LEN 2
 #define JUMP_3_LEN 2
 #define JUMP_7_LEN 2
 #define SWITCH_3_LEN 2

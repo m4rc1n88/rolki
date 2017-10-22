@@ -86,7 +86,7 @@ void initUdp(){
 void initStrip(){
 	strip.Begin();
 	strip.SetStrip(blue);
-	strip.setProgram(HSV_TO_WHITE);
+	strip.setProgram(HSL_TO_WHITE);
 	strip.setSegmentLength(4);
 	strip.setSpeedLevel(4);
 	strip.Show();
@@ -207,6 +207,42 @@ void readUdpData(){
 					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
 					strip.setSpeedLevel(packetBuffer[6]);
 					strip.setProgram(PULSE);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
+
+			case HSL_SNAKE:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program HSL Snake");
+				#endif
+				if(packetBuffer[2] == HSL_SNAKE_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setBrightnessLevel(packetBuffer[3]);
+					strip.setSpeedLevel(packetBuffer[4]);
+					strip.setProgram(HSL_SNAKE);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
+
+			case HSL_TO_WHITE:
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program HSL to white");
+				#endif
+				if(packetBuffer[2] == HSL_TO_WHITE_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setBrightnessLevel(packetBuffer[3]);
+					strip.setSpeedLevel(packetBuffer[4]);
+					strip.setProgram(HSL_TO_WHITE);
 				} else {
 					#if DUBUG_RECIEVED >= 1
 					Serial.println("Length of parameters - N_OK");
