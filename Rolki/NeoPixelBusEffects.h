@@ -74,6 +74,7 @@ public:
 
 
 	void SetPixelColor(uint8_t p_pixel_number, RgbColor p_pixel_color, bool p_gamma = 0){
+		if(p_gamma) p_pixel_color = colorGamma.Correct(p_pixel_color);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(p_pixel_number, p_pixel_color);
 		//gamma correction will be implemented
 	}
@@ -236,7 +237,7 @@ public:
 	    	//v_color = colorGamma.Correct(RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL)));
 	    	//Serial.print("Progress[");Serial.print(i);Serial.print("] = ");Serial.print(v_f_progressH);
 	    	v_color = RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL));
-	    	SetPixelColor(i, v_color);
+	    	SetPixelColor(i, v_color, GAMMA_CORRECTION_ON);
 	    }
 
 
@@ -244,22 +245,18 @@ public:
 	}
 
 	void HslSnake(){
-		uint16_t switchNum;
+		uint32_t v_switchNum;
 		RgbColor v_color;
-		float progress;
-		switchNum = (65536/(1 << _speedLevel));
-
+		float v_f_progress;
+		v_switchNum = (65536/(1 << _speedLevel));
 		for(uint8_t i = 0; i < PixelCount(); i++ ){
-			progress = (i * (switchNum / static_cast<float>(PixelCount() - 1)) + _step % switchNum)/switchNum;
-			if(progress > 1.0f)progress -= 1.0f;
-			//v_color = colorGamma.Correct(RgbColor(HslColor(progress, 1.0f, 0.5f)));
-			v_color = RgbColor(HslColor(progress, 1.0f, 0.5f));
-			SetPixelColor(i, v_color);
+			v_f_progress = (i * (v_switchNum / static_cast<float>(PixelCount() - 1)) + _step % v_switchNum) / v_switchNum;
+			if(v_f_progress > 1.0f)v_f_progress -= 1.0f;
+			v_color = RgbColor(HslColor(v_f_progress, 1.0f, 0.5f));
+			SetPixelColor(i, v_color, GAMMA_CORRECTION_ON);
 		}
-
 		SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
 	}
-
 
 
 	void swapTwoColor(){
@@ -342,6 +339,7 @@ private:
 	RgbColor black = RgbColor(0);
 
 	RgbColor tabColor[MAX_COLOR_NUM];// = {RgbColor(255, 0, 0), RgbColor(255, 0, 0)};
+	NeoGamma<NeoGammaTableMethod> colorGamma;
 
 };
 
