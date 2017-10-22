@@ -290,6 +290,8 @@ public:
 	}
 
 	void setSegmentLength(uint8_t p_segmentLength){
+		if(p_segmentLength == 0)p_segmentLength = 1;
+		if(p_segmentLength > PixelCount() / 2) p_segmentLength = PixelCount() \ 2;
 		_segmentLength = p_segmentLength;
 	}
 
