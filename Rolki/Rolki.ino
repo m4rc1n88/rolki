@@ -5,7 +5,7 @@
 #include "Defintion.h"
 
 #pragma once
-#define PixelCount 12
+#define PixelCount 24
 #define PixelPin 2
 
 #define AP_MODE 1
@@ -86,7 +86,9 @@ void initUdp(){
 void initStrip(){
 	strip.Begin();
 	strip.SetStrip(blue);
-	strip.setProgram(4);
+	strip.setProgram(HSV_TO_WHITE);
+	strip.setSegmentLength(4);
+	strip.setSpeedLevel(4);
 	strip.Show();
 
 }
@@ -290,13 +292,37 @@ void readUdpData(){
 
 			case SNAKE:
 				#if DUBUG_RECIEVED >= 1
-				Serial.println("Program Turn Off");
+				Serial.println("Program Snake");
 				#endif
 				if(packetBuffer[2] == SNAKE_LEN){
 					#if DUBUG_RECIEVED >= 1
 					Serial.println("Length of parameters - OK");
 					#endif
-					//action
+					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
+					strip.setColor(packetBuffer[6], packetBuffer[7], packetBuffer[8], 1);
+					strip.setSpeedLevel(packetBuffer[9]);
+					strip.setSegmentLength(packetBuffer[10]);
+					strip.setProgram(SNAKE);
+				} else {
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - N_OK");
+					#endif
+				}
+				break;
+
+			case SWAP_2_COLORS: //not tested
+				#if DUBUG_RECIEVED >= 1
+				Serial.println("Program Swap 2 Colors");
+				#endif
+				if(packetBuffer[2] == SWAP_2_COLORS_LEN){
+					#if DUBUG_RECIEVED >= 1
+					Serial.println("Length of parameters - OK");
+					#endif
+					strip.setColor(packetBuffer[3], packetBuffer[4], packetBuffer[5], 0);
+					strip.setColor(packetBuffer[6], packetBuffer[7], packetBuffer[8], 1);
+					strip.setSpeedLevel(packetBuffer[9]);
+					strip.setSegmentLength(packetBuffer[10]);
+					strip.setProgram(BLINK_2_COLORS);
 				} else {
 					#if DUBUG_RECIEVED >= 1
 					Serial.println("Length of parameters - N_OK");

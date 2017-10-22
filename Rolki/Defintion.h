@@ -17,15 +17,16 @@
 #define BLINK	2
 #define BLINK_2_COLORS	3
 #define PULSE 4
-#define HSV_SNAKE	5
-#define HSV_TO_WHITE	6
+#define HSV_SNAKE 5
+#define HSV_TO_WHITE 6
 #define HSV	7
-#define JUMP_3	8
-#define JUMP_7	9
-#define SWITCH_3	10
-#define SWITCH_7	11
-#define SNAKE	12
-#define Niustraszony 	13
+#define JUMP_3 8
+#define JUMP_7 9
+#define SWITCH_3 10
+#define SWITCH_7 11
+#define SNAKE 12
+#define Niustraszony 13
+#define SWAP_2_COLORS 14
 
 #define TURN_OFF_LEN 0
 #define SIMPLE_LEN	3
@@ -40,7 +41,8 @@
 #define SWITCH_3_LEN 2
 #define SWITCH_7_LEN 2
 #define SNAKE_LEN 8
-#define Niustraszony 	0x0D
+#define Niustraszony_LEN 8
+#define SWAP_2_COLORS_LEN 8
 
 
 #endif /* DEFINTION_H_ */

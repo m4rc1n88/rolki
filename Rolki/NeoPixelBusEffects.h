@@ -117,8 +117,17 @@ public:
 		case JUMP_7:
 			jumpColor(tabColor, 7);
 			break;
-		case 22:
+		case SWAP_2_COLORS:
 			swapTwoColor();
+			break;
+		case SNAKE:
+			snake();
+			break;
+		case HSV_SNAKE:
+			HSLSnake();
+			break;
+		case HSV_TO_WHITE:
+			HslToWhite();
 			break;
 		}
 		//blink();
@@ -140,7 +149,7 @@ public:
 		//if(g_debugLevel > 2)Serial.print("case: ");
 		//if(g_debugLevel > 2)Serial.print((_step/switchNum)%num);
 
-		// protection from _step overflow in next iteration(two color in row or cut some colors) not tested
+		// protection from _step overflow in next iteration(two color in row or miss some colors) not tested
 		if( (( _step / switchNum ) % num == 0) && (_step + num * switchNum > 0xFFFFFF) )_step = 0;
 		SetStrip(color[(_step / switchNum) % num]);
 		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
@@ -174,7 +183,7 @@ public:
 
 
 		SetStrip( color[ ((_step / switchNum) % (num * 2)) / 2] );
-		if( !( ( (_step / switchNum) % (num * 2) ) % 2 ) )	  {
+		if( !( ( (_step / switchNum) % (num * 2) ) % 2 ) ) {
 			//Serial.println(0);
 			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(actualBrightness);
 		} else {
@@ -184,9 +193,58 @@ public:
 	}//End function switchColor
 
 	void snake(){
+		uint16_t v_switchNum;
+		uint8_t v_startPixel;
+		v_switchNum = (16384/(1 << _speedLevel));
+		if( (( _step / v_switchNum ) % NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() == 0) &&
+				(_step + NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() * v_switchNum > 0xFFFFFF) )_step = 0;
+		v_startPixel = (_step / v_switchNum) % NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount();
+		SetStrip(tabColor[0]);
+		for(uint8_t i = 0; i < _segmentLength; i++ ){
+			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor( (i + v_startPixel) % NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(), tabColor[1]);
+		}
+	}
+
+
+	void  HslToWhite(){
+		uint16_t v_switchNum;
+		RgbColor v_color;
+		float v_f_progressL, v_f_progressH;
+		v_switchNum = (65536/(1 << _speedLevel));
+		v_f_progressL = (_step % v_switchNum)/static_cast<float>(v_switchNum);
+
+		if((_step / v_switchNum) % 2 ) v_f_progressL = 1 - v_f_progressL;
+
+	    for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++){
+	    	v_f_progressH = i / static_cast<float>(NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() - 1);
+	    	//v_color = colorGamma.Correct(RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL)));
+	    	//Serial.print("Progress[");Serial.print(i);Serial.print("] = ");Serial.print(v_f_progressH);
+	    	v_color = RgbColor(HslColor(v_f_progressH, 1.0f, v_f_progressL));
+	    	NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, v_color);
+	    }
+
 
 
 	}
+
+	void HSLSnake(){
+		uint16_t switchNum;
+		RgbColor v_color;
+		float progress;
+		switchNum = (65536/(1 << _speedLevel));
+
+		for(uint8_t i = 0; i < NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount(); i++ ){
+			progress = (i * (switchNum / static_cast<float>(NeoPixelBus<T_COLOR_FEATURE, T_METHOD>::PixelCount() - 1)) + _step % switchNum)/switchNum;
+			if(progress > 1.0f)progress -= 1.0f;
+			//v_color = colorGamma.Correct(RgbColor(HslColor(progress, 1.0f, 0.5f)));
+			v_color = RgbColor(HslColor(progress, 1.0f, 0.5f));
+			NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetPixelColor(i, v_color);
+		}
+
+		NeoPixelBrightnessBus<T_COLOR_FEATURE, T_METHOD>::SetBrightness(0xFF / (1 << (8 - _brightnessLevel)));
+	}
+
+
 
 	void swapTwoColor(){
 		uint16_t switchNum;
